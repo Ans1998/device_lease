@@ -1,16 +1,16 @@
-# myapp
+# 演示效果
 
-A new Flutter project.
+![项目演示](https://raw.githubusercontent.com/Aliceco/device_lease/master/images/demo/nNjPajxRnm.gif)
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
+### api
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+```bash
+$ {'code': '200', 'status': 'success', 'msg': '操作成功', 'data': {}}
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### react-umi项目（对接api后端）
+https://github.com/Aliceco/react-umi-admin
+### egg-api项目（对接api接口）
+https://github.com/Aliceco/umi-egg-api
