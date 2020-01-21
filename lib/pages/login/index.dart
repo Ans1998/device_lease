@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 
 import './../navigat/index.dart';
 
+import './../../request/index.dart';
+import 'package:bot_toast/bot_toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 class LoginPages extends StatefulWidget {
 
   LoginPages({Key key}) : super(key: key); // 构造函数
@@ -14,6 +19,9 @@ class _LoginPagesState extends State<LoginPages> {
 
   FocusNode _userNameInputFocus = FocusNode();
   FocusNode _passwordInputFocus = FocusNode();
+
+  String userName;
+  String password;
 
   @override
   Widget build(BuildContext context) {
@@ -95,6 +103,11 @@ class _LoginPagesState extends State<LoginPages> {
                 print('登录');
                 _passwordInputFocus.unfocus(); // 失去焦点
                 _userNameInputFocus.unfocus(); // 失去焦点
+
+                print(userName);
+                print(password);
+
+                __requset();
                 // Navigator.pop(context);
                 // Navigator.push(context, MaterialPageRoute(builder: (context) => MyAppPages()));
                 // Navigator.pushNamed(
@@ -104,9 +117,9 @@ class _LoginPagesState extends State<LoginPages> {
                 //     'tabCurrentIndex': 1
                 //   }
                 // );
-                Navigator.of(context).pushAndRemoveUntil(
-                 MaterialPageRoute(builder: (context) => MyAppPages()
-                ), (route) => route == null);
+                // Navigator.of(context).pushAndRemoveUntil(
+                //  MaterialPageRoute(builder: (context) => MyAppPages()
+                // ), (route) => route == null);
               break;
               case 'register':
                 print('注册');
@@ -114,9 +127,9 @@ class _LoginPagesState extends State<LoginPages> {
                 _userNameInputFocus.unfocus(); // 失去焦点
                 // Navigator.pop(context);
                 // Navigator.push(context, MaterialPageRoute(builder: (context) => MyAppPages()));
-                 Navigator.of(context).pushAndRemoveUntil(
-                 MaterialPageRoute(builder: (context) => MyAppPages()
-                ), (route) => route == null);
+                // Navigator.of(context).pushAndRemoveUntil(
+                //  MaterialPageRoute(builder: (context) => MyAppPages()
+                // ), (route) => route == null);
               break;
             }
           },
@@ -145,6 +158,9 @@ class _LoginPagesState extends State<LoginPages> {
       // 当 value 改变的时候，触发
       onChanged: (val) {
           print(val);
+          setState(() {
+            userName = val;
+          });
       },
       onSubmitted: (text) { // 内容提交(按回车)的回调
         print('submit $text');
@@ -177,10 +193,58 @@ class _LoginPagesState extends State<LoginPages> {
       // 当 value 改变的时候，触发
       onChanged: (val) {
           print(val);
+          setState(() {
+            password = val;
+          });
       },
       onSubmitted: (text) { // 内容提交(按回车)的回调
         print('submit $text');
       },
     );
   }
+   
+  __requset() async {
+    try {
+      Map<String, dynamic> from = {"userName": userName, 'password': password};
+      Map response = await Request().post('/api/login', from);
+      print(response);
+      if (response['status'] == 'success') {
+        BotToast.showLoading( duration: Duration(seconds: 2));
+        // 获取实例
+        var prefs = await SharedPreferences.getInstance();
+        // 设置存储数据
+        String userInfo = json.encode(response['data']['userInfo']);
+        // print(userInfo);
+        // print(userInfo.runtimeType);
+
+        // Map obj = json.decode(userInfo);
+        // print(obj);
+        // print(obj.runtimeType);
+
+        await prefs.setString('userInfo', userInfo);
+        await prefs.setString('token', response['data']['token']);
+
+        await Future.delayed(Duration(seconds: 2));
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => MyAppPages()
+        ), (route) => route == null);
+
+        // Future.delayed(Duration(seconds: 2), () {
+
+        //   Navigator.of(context).pushAndRemoveUntil(
+        //     MaterialPageRoute(builder: (context) => MyAppPages()
+        //   ), (route) => route == null);
+
+        // });
+       
+      } else {
+        BotToast.showSimpleNotification(title: "登录失败", subTitle: response['msg'].toString()); //弹出简单通知Toast
+      }
+    } on Exception catch (e) {
+      print('---catch---');
+      print(e);
+    }
+  }
+
 }

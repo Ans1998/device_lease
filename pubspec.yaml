@@ -26,6 +26,8 @@ dependencies:
   charts_flutter: ^0.8.1
   barcode_scan: ^1.0.0
   dio: ^3.0.8
+  shared_preferences: ^0.5.6
+  bot_toast: ^2.2.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

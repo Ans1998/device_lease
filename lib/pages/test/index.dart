@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import './../../request/index.dart';
+import 'package:bot_toast/bot_toast.dart';
 class TestsPages extends StatefulWidget {
   TestsPages({Key key}) : super(key: key);
 
@@ -33,4 +34,21 @@ class _TestsPagesState extends State<TestsPages> {
         ),
     );
   }
+
+  testRequset() async {
+    try {
+      Map<String, dynamic> from = {"userName": '1', 'password': '1'};
+      Map response = await Request().post('/api/login', from);
+      print(response);
+      if (response['status'] == 'success') {
+         await Future.delayed(Duration(seconds: 2));
+      } else {
+        BotToast.showSimpleNotification(title: "登录失败", subTitle: response['msg'].toString()); //弹出简单通知Toast
+      }
+    } on Exception catch (e) {
+      print('---catch---');
+      print(e);
+    }
+  }
+
 }

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+import './../../request/index.dart';
+import 'package:bot_toast/bot_toast.dart';
 class MyPages extends StatefulWidget {
 
   MyPages({Key key}) : super(key: key); // 构造函数
@@ -9,8 +12,22 @@ class MyPages extends StatefulWidget {
 }
 
 class _MyPagesState extends State<MyPages> {
+  
+  getMyInfo() async {
+    // 获取实例
+    var prefs = await SharedPreferences.getInstance();
+    // 获取存储数据
+    String userInfo = prefs.getString('userInfo');
+    Map obj = json.decode(userInfo);
+    print(obj);
+    // print(obj.runtimeType);
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    getMyInfo();
+
     return Scaffold(
       // appBar: AppBar(
       //   title: Text("我的"),
@@ -218,7 +235,7 @@ class _MyPagesState extends State<MyPages> {
                                         padding: EdgeInsets.only(top: 10, bottom: 10),
                                         child: Text("退出登录", style: TextStyle(fontSize: 16)),
                                         onPressed: () {
-                                          Navigator.popAndPushNamed(context, '/login');
+                                          loginOut();
                                           print('按钮');
                                         },
                                       )
@@ -286,5 +303,30 @@ class _MyPagesState extends State<MyPages> {
         ),
       )
     );
+  }
+
+  loginOut() async {
+     // 获取实例
+    var prefs = await SharedPreferences.getInstance();
+    try {
+      Map<String, dynamic> from = {};
+      Map response = await Request().post('/api/logOut', from);
+      print(response);
+      if (response['status'] == 'success') {
+        BotToast.showLoading( duration: Duration(seconds: 2));
+        await Future.delayed(Duration(seconds: 2));
+        // 删除存储数据
+        prefs.remove('userInfo');
+        prefs.remove('token');
+        Navigator.popAndPushNamed(context, '/login');
+        // prefs.remove(key); //删除指定键
+        // prefs.clear();//清空键值对
+      } else {
+        BotToast.showSimpleNotification(title: "退出失败", subTitle: response['msg'].toString()); //弹出简单通知Toast
+      }
+    } on Exception catch (e) {
+      print('---catch---');
+      print(e);
+    }
   }
 }

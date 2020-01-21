@@ -8,6 +8,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:barcode_scan/barcode_scan.dart';
 
+
 class HomePages extends StatefulWidget {
 
   HomePages({Key key}) : super(key: key); // 构造函数
